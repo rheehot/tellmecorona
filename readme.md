@@ -13,4 +13,6 @@
 export NODE_ENV=production
 ```
 # 서비스
+![tellmecorona](/tellmecorona.JPG)
+
 http://t.me/tellmecorona
