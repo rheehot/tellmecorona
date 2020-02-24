@@ -1,5 +1,6 @@
 # Tell Me Corona?
 'tellmecorona'는 코로나 확진자 수가 변동되면 즉시 알려주는 텔레그램 봇 프로그램입니다.
+자세한 이야기는 [미디엄블로그](https://medium.com/@larkbless/%EC%BD%94%EB%A1%9C%EB%82%98-%ED%99%95%EC%A7%84%EC%9E%90-%EC%95%8C%EB%A6%AC%EB%AF%B8-%ED%85%94%EB%A0%88%EA%B7%B8%EB%9E%A8-%EB%B4%87-%EB%A7%8C%EB%93%A4%EA%B8%B0-e9eb9928dc37)에서 보실 수 있습니다.
 
 # 사용방법
 1. tellmecorona 저장소를 `clone` 받습니다.
