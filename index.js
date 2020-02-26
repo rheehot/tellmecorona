@@ -47,7 +47,7 @@ requester.load().then(data => {
       console.log(timeMessage + statusMessage);
       bot.sendMessage(timeMessage + statusMessage);
     }
-  });
 
-  db.end();
+    db.end();
+  });
 });
