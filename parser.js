@@ -11,7 +11,13 @@ class parser {
       text
     );
 
-    return new Date(regexp[1], regexp[2], regexp[3], regexp[4], regexp[5]);
+    return new Date(
+      Number(regexp[1]),
+      Number(regexp[2]) - 1,
+      Number(regexp[3]),
+      Number(regexp[4]),
+      Number(regexp[5])
+    );
   }
 
   getStatus(data) {
@@ -22,10 +28,34 @@ class parser {
       let title = $(element)
         .find(".txt_sort")
         .text();
-      let num = $(element)
+      let value = $(element)
         .find(".num")
         .text();
-      result.push([title, num]);
+      let keyType;
+
+      switch (title) {
+        case "확진환자":
+          keyType = "infected";
+          break;
+        case "검사진행":
+          keyType = "tested";
+          break;
+        case "격리해제":
+          keyType = "recovered";
+          break;
+        case "사망자":
+          keyType = "deaths";
+          break;
+      }
+
+      result.push({
+        key: keyType,
+        data: {
+          title: title,
+          displayValue: value,
+          value: value.replace(",", "")
+        }
+      });
     });
 
     return result;
