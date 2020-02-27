@@ -22,9 +22,10 @@ requester.load().then(data => {
       let statusMessage = status
         .map(item => {
           let result = item.data.title + " " + item.data.displayValue + "명";
+          let increment = item.data.value - recentLog[item.key];
 
-          if (item.data.value > 0) {
-            result += `(+${item.data.value - recentLog[item.key]})`;
+          if (increment > 0) {
+            result += `(+${increment})`;
           }
 
           return result;
