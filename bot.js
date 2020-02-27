@@ -1,5 +1,6 @@
-const config = require("./config.json");
+const moment = require("moment");
 const TelegramBotAPI = require("node-telegram-bot-api");
+const config = require("./config.json");
 const token = config.telegram_token;
 
 class TelegramBot {
@@ -19,6 +20,10 @@ class TelegramBot {
     if (process.env.NODE_ENV === "production") {
       this.bot.sendMessage(this.adminId, message);
     }
+  }
+
+  sendStartMessage() {
+    this.bot.sendMessageAdmin(moment().format("YYYY-MM-DD HH:mm:ss") + " Start.");
   }
 }
 

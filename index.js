@@ -7,7 +7,7 @@ const bot = new (require("./bot.js"))();
 const requester = new (require("./requester"))();
 const parser = new (require("./parser"))();
 
-bot.sendMessageAdmin(moment().format("YYYY-MM-DD HH:mm:ss") + " Start.");
+bot.sendStartMessage();
 
 requester.load().then(data => {
   let currentTimestamp = parser.getUpdateDate(data).getTime();
