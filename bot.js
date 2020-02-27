@@ -23,9 +23,7 @@ class TelegramBot {
   }
 
   sendStartMessage() {
-    this.bot.sendMessageAdmin(
-      moment().format('YYYY-MM-DD HH:mm:ss') + ' Start.'
-    )
+    this.sendMessageAdmin(moment().format('YYYY-MM-DD HH:mm:ss') + ' Start.')
   }
 }
 
