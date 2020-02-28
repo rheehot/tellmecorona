@@ -3,11 +3,11 @@ const _ = require('lodash')
 const db = new (require('./database/mysql'))()
 moment.locale('ko')
 
-const bot = new (require('./bot.js'))()
+const Bot = new (require('./bot.js'))()
 const Requester = new (require('./requester'))()
 const parser = new (require('./parser'))()
 
-bot.sendStartMessage()
+Bot.sendStartMessage()
 
 Requester
   .load()
@@ -54,7 +54,7 @@ Requester
           )
 
           console.log(timeMessage + statusMessage)
-          bot.sendMessage(timeMessage + statusMessage)
+          Bot.sendMessage(timeMessage + statusMessage)
         }
       }
 
@@ -62,5 +62,5 @@ Requester
     })
   })
   .catch((error: any) => {
-    bot.sendMessageAdmin('ERROR: ' + error.message + '(path: Requester.load)')
+    Bot.sendMessageAdmin('ERROR: ' + error.message + '(path: Requester.load)')
   })

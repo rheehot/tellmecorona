@@ -1,4 +1,4 @@
-;(function() {
+;(() => {
   const moment = require('moment')
   const TelegramBotAPI = require('node-telegram-bot-api')
   const config = require('./config.json')
