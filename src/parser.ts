@@ -1,8 +1,8 @@
-;(function() {
+;(() => {
   const cheerio = require('cheerio')
 
-  class parser {
-    public getUpdateDate(data: any): Date | null {
+  class Parser {
+    public getUpdateDate(data: any): Date {
       const $ = cheerio.load(data)
       let text: string = $('.update_info .text')
         .first()
@@ -12,10 +12,7 @@
         text
       )
 
-      if (regexp === null) {
-        console.error('Failed: 업데이트 날짜 파싱 실패')
-        return null
-      }
+      if (regexp === null) throw '업데이트 날짜 파싱 실패'
 
       let [, year, month, date, hours, minutes] = regexp
 
@@ -76,5 +73,5 @@
     }
   }
 
-  module.exports = parser
+  module.exports = Parser
 })()

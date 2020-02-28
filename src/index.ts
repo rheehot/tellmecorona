@@ -9,57 +9,61 @@ const parser = new (require('./parser'))()
 
 Bot.sendStartMessage()
 
-Requester
-  .load()
+Requester.load()
   .then((data: any) => {
-    let currentTimestamp: number = parser.getUpdateDate(data).getTime()
+    try {
+      let currentTimestamp: number = parser.getUpdateDate(data).getTime()
 
-    db.getRecentLog((recentLog: any) => {
-      let lastTimestamp: number = new Date(recentLog.date).getTime()
+      db.getRecentLog((recentLog: any) => {
+        let lastTimestamp: number = new Date(recentLog.date).getTime()
 
-      console.log(currentTimestamp, lastTimestamp)
+        console.log(currentTimestamp, lastTimestamp)
 
-      if (currentTimestamp !== lastTimestamp) {
-        let currentDate: any = moment(currentTimestamp)
-        let timeMessage: string =
-          currentDate.format('YYYY년 MM월 DD일 A hh시') + '\n'
-        let status: object[] | null = parser.getStatus(data)
+        if (currentTimestamp !== lastTimestamp) {
+          let currentDate: any = moment(currentTimestamp)
+          let timeMessage: string =
+            currentDate.format('YYYY년 MM월 DD일 A hh시') + '\n'
+          let status: object[] | null = parser.getStatus(data)
 
-        if (status !== null) {
-          let statusMessage: string = status
-            .map((item: any) => {
-              let result: string =
-                item.data.title + ' ' + item.data.displayValue + '명'
-              let increment: number = item.data.value - recentLog[item.key]
+          if (status !== null) {
+            let statusMessage: string = status
+              .map((item: any) => {
+                let result: string =
+                  item.data.title + ' ' + item.data.displayValue + '명'
+                let increment: number = item.data.value - recentLog[item.key]
 
-              if (increment > 0) {
-                result += `(+${increment})`
-              }
+                if (increment > 0) {
+                  result += `(+${increment})`
+                }
 
-              return result
-            })
-            .join('\n')
+                return result
+              })
+              .join('\n')
 
-          let infectedItem: any = _.find(status, { key: 'infected' })
-          let testedItem: any = _.find(status, { key: 'tested' })
-          let recoveredItem: any = _.find(status, { key: 'recovered' })
-          let deathsItem: any = _.find(status, { key: 'deaths' })
+            let infectedItem: any = _.find(status, { key: 'infected' })
+            let testedItem: any = _.find(status, { key: 'tested' })
+            let recoveredItem: any = _.find(status, { key: 'recovered' })
+            let deathsItem: any = _.find(status, { key: 'deaths' })
 
-          db.addLog(
-            currentDate.format('YYYY-MM-DD HH:mm:ss'),
-            infectedItem.data.value,
-            recoveredItem.data.value,
-            deathsItem.data.value,
-            testedItem.data.value
-          )
+            db.addLog(
+              currentDate.format('YYYY-MM-DD HH:mm:ss'),
+              infectedItem.data.value,
+              recoveredItem.data.value,
+              deathsItem.data.value,
+              testedItem.data.value
+            )
 
-          console.log(timeMessage + statusMessage)
-          Bot.sendMessage(timeMessage + statusMessage)
+            console.log(timeMessage + statusMessage)
+            Bot.sendMessage(timeMessage + statusMessage)
+          }
         }
-      }
 
-      db.end()
-    })
+        db.end()
+      })
+    } catch (e) {
+      console.error(e)
+      Bot.sendMessageAdmin('ERROR: ' + e)
+    }
   })
   .catch((error: any) => {
     Bot.sendMessageAdmin('ERROR: ' + error.message + '(path: Requester.load)')
