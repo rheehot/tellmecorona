@@ -4,12 +4,12 @@ const db = new (require('./database/mysql'))()
 moment.locale('ko')
 
 const bot = new (require('./bot.js'))()
-const requester = new (require('./requester'))()
+const Requester = new (require('./requester'))()
 const parser = new (require('./parser'))()
 
 bot.sendStartMessage()
 
-requester
+Requester
   .load()
   .then((data: any) => {
     let currentTimestamp: number = parser.getUpdateDate(data).getTime()
@@ -62,5 +62,5 @@ requester
     })
   })
   .catch((error: any) => {
-    bot.sendMessageAdmin('ERROR: ' + error.message + '(path: requester.load)')
+    bot.sendMessageAdmin('ERROR: ' + error.message + '(path: Requester.load)')
   })

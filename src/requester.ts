@@ -1,7 +1,7 @@
 ;(() => {
   const request = require('request')
 
-  class requester {
+  class Requester {
     public load(): Promise<PromiseConstructor> {
       const url: string =
         'https://m.search.naver.com/search.naver?ie=utf8&query=%EC%BD%94%EB%A1%9C%EB%82%98+%ED%99%95%EC%A7%84%EC%9E%90'
@@ -22,5 +22,5 @@
     }
   }
 
-  module.exports = requester
+  module.exports = Requester
 })()
