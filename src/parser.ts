@@ -36,24 +36,15 @@
           .find('.num')
           .text()
         let value: number = Number(displayValue.replace(',', ''))
-        let keyType: string | null = null
-
-        switch (title) {
-          case '확진환자':
-            keyType = 'infected'
-            break
-          case '검사진행':
-            keyType = 'tested'
-            break
-          case '격리해제':
-            keyType = 'recovered'
-            break
-          case '사망자':
-            keyType = 'deaths'
-            break
+        let keyTypes: any = {
+          확진환자: 'infected',
+          검사진행: 'tested',
+          격리해제: 'recovered',
+          사망자: 'deaths'
         }
+        let keyType: string | undefined = keyTypes[title]
 
-        if (keyType === null) throw '확진자 현황 파싱 실패'
+        if (keyType === undefined) throw '확진자 현황 파싱 실패'
 
         result.push({
           key: keyType,
