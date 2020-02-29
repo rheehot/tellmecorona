@@ -45,7 +45,7 @@ let run = async () => {
 
     let lastLog: Log = await Database.getLastLogByDateLessThan(newLog.date)
     newStatusList.forEach((item: Status) => {
-      let increment: number = item.data.value - lastLog[item.key]
+      let increment: number = item.data.value - Number(lastLog[item.key])
       messages.push(`${item.data.title} ${item.data.displayValue}명` + (increment > 0 ? `(+${increment})` : ''))
     })
 
