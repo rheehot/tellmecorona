@@ -1,19 +1,19 @@
-const moment = require('moment')
 const _ = require('lodash')
-const db = new (require('./database/mysql'))()
-moment.locale('ko')
+const moment = require('moment')
 
 const Bot = new (require('./bot.js'))()
+const Database = new (require('./database/mysql'))()
 const Requester = new (require('./requester'))()
 const Parser = new (require('./parser'))()
 
+moment.locale('ko')
 Bot.sendStartMessage()
 
 let run = async () => {
   try {
     let html: string = await Requester.load()
     let timestamp: number = Parser.getUpdateDate(html).getTime()
-    let recentLog = await db.getRecentLog()
+    let recentLog = await Database.getRecentLog()
     let recentTimestamp: number = new Date(recentLog.date).getTime()
 
     // 업데이트날짜가 최신임
@@ -45,7 +45,7 @@ let run = async () => {
     let recoveredItem: any = _.find(status, { key: 'recovered' })
     let deathsItem: any = _.find(status, { key: 'deaths' })
 
-    db.addLog(
+    Database.addLog(
       currentDate.format('YYYY-MM-DD HH:mm:ss'),
       infectedItem.data.value,
       recoveredItem.data.value,
@@ -59,7 +59,7 @@ let run = async () => {
     console.error(error)
     Bot.sendMessageAdmin('ERROR: ' + error)
   } finally {
-    db.end()
+    Database.end()
   }
 }
 

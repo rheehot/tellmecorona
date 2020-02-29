@@ -35,9 +35,8 @@
         this.connection.query(
           'SELECT * FROM `log` ORDER BY `date` DESC LIMIT 1',
           (error: any, result: any, fields: any) => {
-            if (error) {
-              reject(error)
-            }
+            if (error) reject(error)
+
             resolve(result[0])
           }
         )
