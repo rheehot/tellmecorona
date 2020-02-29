@@ -21,6 +21,7 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
+    "@types/mysql": "^2.15.9",
     "@types/request": "^2.48.4",
     "typescript": "^3.8.2"
   }
