@@ -2,15 +2,14 @@
   const cheerio = require('cheerio')
 
   class Parser {
-    public getUpdateDate(data: any): Date {
-      const $ = cheerio.load(data)
+    public getUpdateDate(html: string): Date {
+      const $ = cheerio.load(html)
       let text: string = $('.update_info .text')
         .first()
         .text()
 
-      let regexp: RegExpExecArray | null = /최종업데이트 ([0-9]+)\.([0-9]+)\.([0-9]+)\. ([0-9]+):([0-9]+)/.exec(
-        text
-      )
+      let pattern: any = /최종업데이트 ([0-9]+)\.([0-9]+)\.([0-9]+)\. ([0-9]+):([0-9]+)/
+      let regexp: RegExpExecArray | null = pattern.exec(text)
 
       if (regexp === null) throw '업데이트 날짜 파싱 실패'
 
@@ -25,8 +24,8 @@
       )
     }
 
-    public getStatus(data: any): object[] | null {
-      const $ = cheerio.load(data)
+    public getStatus(html: string): object[] {
+      const $ = cheerio.load(html)
       const result: object[] = []
 
       $('.circle .txt').each((index: number, element: any) => {
@@ -54,10 +53,7 @@
             break
         }
 
-        if (keyType === null) {
-          console.error('Failed: 확진자 현황 파싱 실패')
-          return null
-        }
+        if (keyType === null) throw '확진자 현황 파싱 실패'
 
         result.push({
           key: keyType,
