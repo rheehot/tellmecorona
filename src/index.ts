@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import moment from 'moment'
 import TelegramAPI from './telegram'
-import Database from './database/mysql'
+import Database, { Log } from './database/mysql'
 import Requester from './requester'
 import Parser, { Status } from './parser'
 
@@ -11,39 +11,51 @@ TelegramAPI.sendStartMessage()
 let run = async () => {
   try {
     let html: string = await Requester.load()
-    let timestamp: number = Parser.getUpdateDate(html).getTime()
-    let recentLog: any = await Database.getRecentLog()
-    let recentTimestamp: number = new Date(recentLog.date).getTime()
+    let newUpdateDate: Date = Parser.getUpdateDate(html)
+    let newStatusList: Status[] = Parser.getStatus(html)
+    let newStatusInfected: Status | undefined = _.find(newStatusList, { key: 'infected' })
+    let newStatusTested: Status | undefined = _.find(newStatusList, { key: 'tested' })
+    let newStatusRecovered: Status | undefined = _.find(newStatusList, { key: 'recovered' })
+    let newStatusDeaths: Status | undefined = _.find(newStatusList, { key: 'deaths' })
 
-    // 업데이트날짜가 최신임
-    if (timestamp === recentTimestamp) return
+    if (newStatusInfected === undefined || newStatusTested === undefined || newStatusRecovered === undefined || newStatusDeaths === undefined)
+      throw '확진자 파싱 실패'
 
-    let currentDate: moment.Moment = moment(timestamp)
+    let newLog: Log = {
+      date: newUpdateDate,
+      infected: newStatusInfected.data.value,
+      recovered: newStatusRecovered.data.value,
+      deaths: newStatusDeaths.data.value,
+      tested: newStatusTested.data.value
+    }
+
+    // 업데이트 데이터가 최신
+    if ((await Database.getLog(newLog)) !== undefined) return
+
     let messages: string[] = []
-    let statusList: Status[] = Parser.getStatus(html)
 
-    messages.push(currentDate.format('YYYY년 MM월 DD일 A hh시'))
+    messages.push(moment(newLog.date).format('YYYY년 MM월 DD일 A hh시'))
 
-    statusList.forEach((item: Status) => {
-      let increment: number = item.data.value - recentLog[item.key]
+    let alreadyExistLog = await Database.getLogByDate(newUpdateDate)
+    if (alreadyExistLog) {
+      Database.updateLogByDate(newLog)
+    } else {
+      Database.addLog(newLog)
+    }
 
+    // TODO: Log type
+    let lastLog: any = await Database.getLastLogByDateLess(newLog.date)
+    newStatusList.forEach((item: Status) => {
+      let increment: number = item.data.value - lastLog[item.key]
       messages.push(`${item.data.title} ${item.data.displayValue}명` + (increment > 0 ? `(+${increment})` : ''))
     })
 
-    let infectedItem: Status | undefined = _.find(statusList, { key: 'infected' })
-    let testedItem: Status | undefined = _.find(statusList, { key: 'tested' })
-    let recoveredItem: Status | undefined = _.find(statusList, { key: 'recovered' })
-    let deathsItem: Status | undefined = _.find(statusList, { key: 'deaths' })
-
-    if (infectedItem === undefined || testedItem === undefined || recoveredItem === undefined || deathsItem === undefined) throw '확진자 파싱 실패'
-
-    Database.addLog(
-      currentDate.format('YYYY-MM-DD HH:mm:ss'),
-      infectedItem.data.value,
-      recoveredItem.data.value,
-      deathsItem.data.value,
-      testedItem.data.value
-    )
+    // 데이터가 변경되어 재알림
+    if (alreadyExistLog) {
+      let newMessages = messages.slice()
+      newMessages.unshift('[데이터가 새로 업데이트 되었습니다]')
+      TelegramAPI.sendMessage(newMessages.join('\n'))
+    }
 
     console.log(messages.join('\n'))
     TelegramAPI.sendMessage(messages.join('\n'))
