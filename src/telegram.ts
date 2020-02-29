@@ -1,11 +1,11 @@
+import moment from 'moment'
+import TelegramBot from 'node-telegram-bot-api'
+import * as config from './config.json'
 ;(() => {
-  const moment = require('moment')
-  const TelegramBotAPI = require('node-telegram-bot-api')
-  const config = require('./config.json')
   const token = config.telegram_token
 
-  class TelegramBot {
-    private bot: any = new TelegramBotAPI(token)
+  class TelegramAPI {
+    private bot: TelegramBot = new TelegramBot(token)
     private channelId: string
     private adminId: number
 
@@ -31,5 +31,5 @@
     }
   }
 
-  module.exports = TelegramBot
+  module.exports = TelegramAPI
 })()

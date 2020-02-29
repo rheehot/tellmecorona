@@ -1,13 +1,13 @@
 const _ = require('lodash')
 const moment = require('moment')
 
-const Bot = new (require('./bot.js'))()
+const TelegramAPI = new (require('./telegram.js'))()
 const Database = new (require('./database/mysql'))()
 const Requester = new (require('./requester'))()
 const Parser = new (require('./parser'))()
 
 moment.locale('ko')
-Bot.sendStartMessage()
+TelegramAPI.sendStartMessage()
 
 let run = async () => {
   try {
@@ -50,10 +50,10 @@ let run = async () => {
     )
 
     console.log(messages.join('\n'))
-    Bot.sendMessage(messages.join('\n'))
+    TelegramAPI.sendMessage(messages.join('\n'))
   } catch (error) {
     console.error(error)
-    Bot.sendMessageAdmin('ERROR: ' + error)
+    TelegramAPI.sendMessageAdmin('ERROR: ' + error)
   } finally {
     Database.end()
   }
