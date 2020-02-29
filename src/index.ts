@@ -3,7 +3,7 @@ import moment from 'moment'
 import TelegramAPI from './telegram'
 import Database from './database/mysql'
 import Requester from './requester'
-import Parser from './parser'
+import Parser, { Status } from './parser'
 
 moment.locale('ko')
 TelegramAPI.sendStartMessage()
@@ -18,27 +18,24 @@ let run = async () => {
     // 업데이트날짜가 최신임
     if (timestamp === recentTimestamp) return
 
-    let currentDate: any = moment(timestamp)
+    let currentDate: moment.Moment = moment(timestamp)
     let messages: string[] = []
-    let status: object[] | null = Parser.getStatus(html)
+    let statusList: Status[] = Parser.getStatus(html)
 
     messages.push(currentDate.format('YYYY년 MM월 DD일 A hh시'))
 
-    if (status === null) throw '확진자 파싱 실패'
-
-    status.forEach((item: any) => {
+    statusList.forEach((item: Status) => {
       let increment: number = item.data.value - recentLog[item.key]
 
-      messages.push(
-        `${item.data.title} ${item.data.displayValue}명` +
-          (increment > 0 ? `(+${increment})` : '')
-      )
+      messages.push(`${item.data.title} ${item.data.displayValue}명` + (increment > 0 ? `(+${increment})` : ''))
     })
 
-    let infectedItem: any = _.find(status, { key: 'infected' })
-    let testedItem: any = _.find(status, { key: 'tested' })
-    let recoveredItem: any = _.find(status, { key: 'recovered' })
-    let deathsItem: any = _.find(status, { key: 'deaths' })
+    let infectedItem: Status | undefined = _.find(statusList, { key: 'infected' })
+    let testedItem: Status | undefined = _.find(statusList, { key: 'tested' })
+    let recoveredItem: Status | undefined = _.find(statusList, { key: 'recovered' })
+    let deathsItem: Status | undefined = _.find(statusList, { key: 'deaths' })
+
+    if (infectedItem === undefined || testedItem === undefined || recoveredItem === undefined || deathsItem === undefined) throw '확진자 파싱 실패'
 
     Database.addLog(
       currentDate.format('YYYY-MM-DD HH:mm:ss'),

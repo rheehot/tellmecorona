@@ -1,4 +1,14 @@
 import cheerio from 'cheerio'
+
+export interface Status {
+  key: string
+  data: {
+    title: string
+    displayValue: string
+    value: number
+  }
+}
+
 export default new (class Parser {
   public getUpdateDate(html: string): Date {
     const $: CheerioStatic = cheerio.load(html)
@@ -13,18 +23,12 @@ export default new (class Parser {
 
     let [, year, month, date, hours, minutes] = regexp
 
-    return new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(date),
-      Number(hours),
-      Number(minutes)
-    )
+    return new Date(Number(year), Number(month) - 1, Number(date), Number(hours), Number(minutes))
   }
 
-  public getStatus(html: string): object[] {
+  public getStatus(html: string): Status[] {
     const $: CheerioStatic = cheerio.load(html)
-    const result: object[] = []
+    const statusList: Status[] = []
 
     $('.circle .txt').each((index: number, element: any) => {
       let title: string = $(element)
@@ -44,7 +48,7 @@ export default new (class Parser {
 
       if (keyType === undefined) throw '확진자 현황 파싱 실패'
 
-      result.push({
+      statusList.push({
         key: keyType,
         data: {
           title: title,
@@ -54,6 +58,6 @@ export default new (class Parser {
       })
     })
 
-    return result
+    return statusList
   }
 })()
