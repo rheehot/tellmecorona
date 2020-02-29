@@ -42,7 +42,7 @@ export default new (class database {
     )
   }
 
-  public getLastLogByDateLess(date: Date): Promise<Log> {
+  public getLastLogByDateLessThan(date: Date): Promise<Log> {
     return new Promise((resolve, reject) => {
       this.connection.query('SELECT * FROM `log` where `date`<? ORDER BY `date` DESC LIMIT 1', [date], (error: any, result: any, fields: any) => {
         if (error) reject(error)
