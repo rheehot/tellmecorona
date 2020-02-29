@@ -20,25 +20,21 @@ let run = async () => {
     if (timestamp === recentTimestamp) return
 
     let currentDate: any = moment(timestamp)
-    let timeMessage: string =
-      currentDate.format('YYYY년 MM월 DD일 A hh시') + '\n'
+    let messages: string[] = []
     let status: object[] | null = Parser.getStatus(html)
+
+    messages.push(currentDate.format('YYYY년 MM월 DD일 A hh시'))
 
     if (status === null) throw '확진자 파싱 실패'
 
-    let statusMessage: string = status
-      .map((item: any) => {
-        let result: string =
-          item.data.title + ' ' + item.data.displayValue + '명'
-        let increment: number = item.data.value - recentLog[item.key]
+    status.forEach((item: any) => {
+      let increment: number = item.data.value - recentLog[item.key]
 
-        if (increment > 0) {
-          result += `(+${increment})`
-        }
-
-        return result
-      })
-      .join('\n')
+      messages.push(
+        `${item.data.title} ${item.data.displayValue}명` +
+          (increment > 0 ? `(+${increment})` : '')
+      )
+    })
 
     let infectedItem: any = _.find(status, { key: 'infected' })
     let testedItem: any = _.find(status, { key: 'tested' })
@@ -53,8 +49,8 @@ let run = async () => {
       testedItem.data.value
     )
 
-    console.log(timeMessage + statusMessage)
-    Bot.sendMessage(timeMessage + statusMessage)
+    console.log(messages.join('\n'))
+    Bot.sendMessage(messages.join('\n'))
   } catch (error) {
     console.error(error)
     Bot.sendMessageAdmin('ERROR: ' + error)
