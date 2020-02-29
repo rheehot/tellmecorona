@@ -1,10 +1,9 @@
-const _ = require('lodash')
-const moment = require('moment')
-
-const TelegramAPI = new (require('./telegram.js'))()
-const Database = new (require('./database/mysql'))()
-const Requester = new (require('./requester'))()
-const Parser = new (require('./parser'))()
+import _ from 'lodash'
+import moment from 'moment'
+import TelegramAPI from './telegram'
+import Database from './database/mysql'
+import Requester from './requester'
+import Parser from './parser'
 
 moment.locale('ko')
 TelegramAPI.sendStartMessage()
@@ -13,7 +12,7 @@ let run = async () => {
   try {
     let html: string = await Requester.load()
     let timestamp: number = Parser.getUpdateDate(html).getTime()
-    let recentLog = await Database.getRecentLog()
+    let recentLog: any = await Database.getRecentLog()
     let recentTimestamp: number = new Date(recentLog.date).getTime()
 
     // 업데이트날짜가 최신임
