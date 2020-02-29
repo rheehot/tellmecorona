@@ -2,7 +2,7 @@ import mysql from 'mysql'
 import * as config from './config.json'
 
 export interface Log {
-  [key: string]: Date|number
+  [key: string]: Date | number
   date: Date
   infected: number
   recovered: number

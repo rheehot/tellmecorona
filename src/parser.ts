@@ -16,7 +16,7 @@ export default new (class Parser {
       .first()
       .text()
 
-    let pattern: any = /최종업데이트 ([0-9]+)\.([0-9]+)\.([0-9]+)\. ([0-9]+):([0-9]+)/
+    let pattern: RegExp = /최종업데이트 ([0-9]+)\.([0-9]+)\.([0-9]+)\. ([0-9]+):([0-9]+)/
     let regexp: RegExpExecArray | null = pattern.exec(text)
 
     if (regexp === null) throw '업데이트 날짜 파싱 실패'
@@ -30,7 +30,7 @@ export default new (class Parser {
     const $: CheerioStatic = cheerio.load(html)
     const statusList: Status[] = []
 
-    $('.circle .txt').each((index: number, element: any) => {
+    $('.circle .txt').each((index: number, element: CheerioElement) => {
       let title: string = $(element)
         .find('.txt_sort')
         .text()
