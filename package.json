@@ -1,13 +1,17 @@
 {
   "name": "tellmecorona",
   "version": "1.0.0",
-  "description": "",
+  "description": "코로나 확진자 수를 그때그때 알려주는 텔레그램 봇",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "lark",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/larkbless/tellmecorona"
+  },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "loadash": "^1.0.0",
