@@ -5,14 +5,14 @@ moment.locale('ko')
 
 const Bot = new (require('./bot.js'))()
 const Requester = new (require('./requester'))()
-const parser = new (require('./parser'))()
+const Parser = new (require('./parser'))()
 
 Bot.sendStartMessage()
 
 let run = async () => {
   try {
     let html: string = await Requester.load()
-    let timestamp: number = parser.getUpdateDate(html).getTime()
+    let timestamp: number = Parser.getUpdateDate(html).getTime()
     let recentLog = await db.getRecentLog()
     let recentTimestamp: number = new Date(recentLog.date).getTime()
 
@@ -22,7 +22,7 @@ let run = async () => {
     let currentDate: any = moment(timestamp)
     let timeMessage: string =
       currentDate.format('YYYY년 MM월 DD일 A hh시') + '\n'
-    let status: object[] | null = parser.getStatus(html)
+    let status: object[] | null = Parser.getStatus(html)
 
     if (status === null) throw '확진자 파싱 실패'
 
