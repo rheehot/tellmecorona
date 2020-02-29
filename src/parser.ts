@@ -1,6 +1,5 @@
+import cheerio from 'cheerio'
 ;(() => {
-  const cheerio = require('cheerio')
-
   class Parser {
     public getUpdateDate(html: string): Date {
       const $ = cheerio.load(html)
