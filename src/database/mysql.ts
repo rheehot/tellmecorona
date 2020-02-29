@@ -1,6 +1,14 @@
 import mysql from 'mysql'
 import * as config from './config.json'
 
+export interface Log {
+  date: Date
+  infected: number
+  recovered: number
+  deaths: number
+  tested: number
+}
+
 export default new (class database {
   private connection: mysql.Connection
 
@@ -13,32 +21,57 @@ export default new (class database {
     })
   }
 
-  public addLog(
-    date: string,
-    infected: number,
-    recovered: number,
-    deaths: number,
-    tested: number
-  ): void {
+  public addLog(log: Log): void {
     this.connection.query(
       'INSERT INTO `log` (`date`, `infected`, `recovered`, `deaths`, `tested`) VALUES (?, ?, ?, ?, ?)',
-      [date, infected, recovered, deaths, tested],
+      [log.date, log.infected, log.recovered, log.deaths, log.tested],
       (error: any, result: any, fields: any) => {
         if (error) throw error
       }
     )
   }
 
-  public getRecentLog(): Promise<object> {
+  public updateLogByDate(log: Log): void {
+    this.connection.query(
+      'UPDATE `log` SET `infected`=?, `recovered`=?, `deaths`=?, `tested`=? WHERE `date`=?',
+      [log.infected, log.recovered, log.deaths, log.tested, log.date],
+      (error: any, result: any, fields: any) => {
+        if (error) throw error
+      }
+    )
+  }
+
+  public getLastLogByDateLess(date: Date): Promise<Log> {
+    return new Promise((resolve, reject) => {
+      this.connection.query('SELECT * FROM `log` where `date`<? ORDER BY `date` DESC LIMIT 1', [date], (error: any, result: any, fields: any) => {
+        if (error) reject(error)
+
+        resolve(result[0])
+      })
+    })
+  }
+
+  public getLog(log: Log): Promise<Log> {
     return new Promise((resolve, reject) => {
       this.connection.query(
-        'SELECT * FROM `log` ORDER BY `date` DESC LIMIT 1',
+        'SELECT * FROM `log` WHERE `date`=? and `infected`=? and `recovered`=? and `deaths`=? and `tested`=? LIMIT 1',
+        [log.date, log.infected, log.recovered, log.deaths, log.tested],
         (error: any, result: any, fields: any) => {
           if (error) reject(error)
 
           resolve(result[0])
         }
       )
+    })
+  }
+
+  public getLogByDate(date: Date): Promise<Log> {
+    return new Promise((resolve, reject) => {
+      this.connection.query('SELECT * FROM `log` WHERE `date`=? LIMIT 1', [date], (error: any, result: any, fields: any) => {
+        if (error) reject(error)
+
+        resolve(result[0])
+      })
     })
   }
 
