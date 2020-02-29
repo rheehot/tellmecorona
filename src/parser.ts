@@ -2,7 +2,7 @@ import cheerio from 'cheerio'
 ;(() => {
   class Parser {
     public getUpdateDate(html: string): Date {
-      const $ = cheerio.load(html)
+      const $: CheerioStatic = cheerio.load(html)
       let text: string = $('.update_info .text')
         .first()
         .text()
@@ -24,7 +24,7 @@ import cheerio from 'cheerio'
     }
 
     public getStatus(html: string): object[] {
-      const $ = cheerio.load(html)
+      const $: CheerioStatic = cheerio.load(html)
       const result: object[] = []
 
       $('.circle .txt').each((index: number, element: any) => {
