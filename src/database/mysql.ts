@@ -1,9 +1,9 @@
+import mysql from 'mysql'
 ;(function() {
-  const mysql = require('mysql')
   const config: any = require('./config.json')
 
   class db {
-    private connection: any
+    private connection: mysql.Connection
 
     constructor() {
       this.connection = mysql.createConnection({
@@ -30,7 +30,7 @@
       )
     }
 
-    public getRecentLog() {
+    public getRecentLog(): Promise<object> {
       return new Promise((resolve, reject) => {
         this.connection.query(
           'SELECT * FROM `log` ORDER BY `date` DESC LIMIT 1',
