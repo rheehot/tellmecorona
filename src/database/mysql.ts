@@ -25,23 +25,23 @@
         'INSERT INTO `log` (`date`, `infected`, `recovered`, `deaths`, `tested`) VALUES (?, ?, ?, ?, ?)',
         [date, infected, recovered, deaths, tested],
         (error: any, result: any, fields: any) => {
-          if (error) {
-            console.log('DB ERROR: ' + error)
-          }
+          if (error) throw error
         }
       )
     }
 
-    public getRecentLog(callback: any) {
-      return this.connection.query(
-        'SELECT * FROM `log` ORDER BY `date` DESC LIMIT 1',
-        (error: any, result: any, fields: any) => {
-          if (error) {
-            console.log('DB ERROR: ' + error)
+    public getRecentLog() {
+      return new Promise((resolve, reject) => {
+        this.connection.query(
+          'SELECT * FROM `log` ORDER BY `date` DESC LIMIT 1',
+          (error: any, result: any, fields: any) => {
+            if (error) {
+              reject(error)
+            }
+            resolve(result[0])
           }
-          callback(result[0])
-        }
-      )
+        )
+      })
     }
 
     public end(): void {
