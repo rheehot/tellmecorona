@@ -32,10 +32,6 @@ let run = async () => {
     // 업데이트 데이터가 최신
     if ((await Database.getLog(newLog)) !== undefined) return
 
-    let messages: string[] = []
-
-    messages.push(moment(newLog.date).format('YYYY년 MM월 DD일 A hh시'))
-
     let alreadyExistLog = await Database.getLogByDate(newUpdateDate)
     if (alreadyExistLog) {
       Database.updateLogByDate(newLog)
@@ -44,6 +40,8 @@ let run = async () => {
     }
 
     let lastLog: Log = await Database.getLastLogByDateLessThan(newLog.date)
+    let messages: string[] = []
+    messages.push(moment(newLog.date).format('YYYY년 MM월 DD일 A hh시'))
     newStatusList.forEach((item: Status) => {
       let increment: number = item.value - Number(lastLog[item.key])
       messages.push(`${item.title} ${item.displayValue}명` + (increment > 0 ? `(+${increment})` : ''))
