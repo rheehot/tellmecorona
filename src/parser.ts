@@ -38,18 +38,12 @@ export default new (class Parser {
         .find('.num')
         .text()
       let value: number = Number(displayValue.replace(',', ''))
-      let keyTypes: any = {
-        확진환자: 'infected',
-        검사진행: 'tested',
-        격리해제: 'recovered',
-        사망자: 'deaths'
-      }
-      let keyType: string | undefined = keyTypes[title]
+      let statusKey: string | null = this.replaceStatuskeyByTitle(title)
 
-      if (keyType === undefined) throw '확진자 현황 파싱 실패'
+      if (statusKey === null) throw '확진자 현황 파싱 실패'
 
       statusList.push({
-        key: keyType,
+        key: statusKey,
         data: {
           title: title,
           displayValue: displayValue,
@@ -59,5 +53,20 @@ export default new (class Parser {
     })
 
     return statusList
+  }
+
+  private replaceStatuskeyByTitle(title: string): string | null {
+    switch (title) {
+      case '확진환자':
+        return 'infected'
+      case '검사진행':
+        return 'tested'
+      case '격리해제':
+        return 'recovered'
+      case '사망자':
+        return 'deaths'
+    }
+
+    return null
   }
 })()
