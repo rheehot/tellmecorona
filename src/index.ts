@@ -18,15 +18,15 @@ let run = async () => {
     let newStatusRecovered: Status | undefined = _.find(newStatusList, { key: 'recovered' })
     let newStatusDeaths: Status | undefined = _.find(newStatusList, { key: 'deaths' })
 
-    if (newStatusInfected === undefined || newStatusTested === undefined || newStatusRecovered === undefined || newStatusDeaths === undefined)
+    if ([newStatusInfected, newStatusTested, newStatusRecovered, newStatusDeaths].some(element => element === undefined))
       throw '확진자 파싱 실패'
 
     let newLog: Log = {
       date: newUpdateDate,
-      infected: newStatusInfected.data.value,
-      recovered: newStatusRecovered.data.value,
-      deaths: newStatusDeaths.data.value,
-      tested: newStatusTested.data.value
+      infected: newStatusInfected!.data.value,
+      recovered: newStatusRecovered!.data.value,
+      deaths: newStatusDeaths!.data.value,
+      tested: newStatusTested!.data.value
     }
 
     // 업데이트 데이터가 최신
