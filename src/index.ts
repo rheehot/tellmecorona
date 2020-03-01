@@ -23,10 +23,10 @@ let run = async () => {
 
     let newLog: Log = {
       date: newUpdateDate,
-      infected: newStatusInfected!.data.value,
-      recovered: newStatusRecovered!.data.value,
-      deaths: newStatusDeaths!.data.value,
-      tested: newStatusTested!.data.value
+      infected: newStatusInfected!.value,
+      recovered: newStatusRecovered!.value,
+      deaths: newStatusDeaths!.value,
+      tested: newStatusTested!.value
     }
 
     // 업데이트 데이터가 최신
@@ -45,8 +45,8 @@ let run = async () => {
 
     let lastLog: Log = await Database.getLastLogByDateLessThan(newLog.date)
     newStatusList.forEach((item: Status) => {
-      let increment: number = item.data.value - Number(lastLog[item.key])
-      messages.push(`${item.data.title} ${item.data.displayValue}명` + (increment > 0 ? `(+${increment})` : ''))
+      let increment: number = item.value - Number(lastLog[item.key])
+      messages.push(`${item.title} ${item.displayValue}명` + (increment > 0 ? `(+${increment})` : ''))
     })
 
     // 데이터가 변경되어 재알림

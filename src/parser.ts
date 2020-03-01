@@ -2,11 +2,9 @@ import cheerio from 'cheerio'
 
 export interface Status {
   key: string
-  data: {
-    title: string
-    displayValue: string
-    value: number
-  }
+  title: string
+  displayValue: string
+  value: number
 }
 
 export default new (class Parser {
@@ -44,11 +42,9 @@ export default new (class Parser {
 
       statusList.push({
         key: statusKey,
-        data: {
-          title: title,
-          displayValue: displayValue,
-          value: value
-        }
+        title: title,
+        displayValue: displayValue,
+        value: value
       })
     })
 
