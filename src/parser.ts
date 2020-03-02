@@ -5,15 +5,13 @@ export interface Status {
   title: string
   displayValue: string
   value: number
+  increment: number
 }
 
 export default new (class Parser {
   public getUpdateDate(html: string): Date {
     const $: CheerioStatic = cheerio.load(html)
-    let text: string = $('.update_info .text')
-      .first()
-      .text()
-
+    let text: string = $('.update_info .text').text()
     let pattern: RegExp = /최종업데이트 ([0-9]+)\.([0-9]+)\.([0-9]+)\. ([0-9]+):([0-9]+)/
     let regexp: RegExpExecArray | null = pattern.exec(text)
 
@@ -28,14 +26,18 @@ export default new (class Parser {
     const $: CheerioStatic = cheerio.load(html)
     const statusList: Status[] = []
 
-    $('.circle .txt').each((index: number, element: CheerioElement) => {
+    $('.status_info li').each((index: number, element: CheerioElement) => {
       let title: string = $(element)
-        .find('.txt_sort')
+        .find('.info_title')
         .text()
       let displayValue: string = $(element)
-        .find('.num')
+        .find('.info_num')
+        .text()
+      let displayIncrement: string = $(element)
+        .find('.info_variation')
         .text()
       let value: number = Number(displayValue.replace(',', ''))
+      let increment: number = Number(displayIncrement.replace(',', ''))
       let statusKey: string | null = this.replaceStatuskeyByTitle(title)
 
       if (statusKey === null) throw '확진자 현황 파싱 실패'
@@ -44,7 +46,8 @@ export default new (class Parser {
         key: statusKey,
         title: title,
         displayValue: displayValue,
-        value: value
+        value: value,
+        increment: increment
       })
     })
 

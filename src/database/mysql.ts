@@ -8,6 +8,10 @@ export interface Log {
   recovered: number
   deaths: number
   tested: number
+  infectedIncrement: number
+  recoveredIncrement: number
+  deathsIncrement: number
+  testedIncrement: number
 }
 
 export default new (class database {
@@ -24,8 +28,18 @@ export default new (class database {
 
   public addLog(log: Log): void {
     this.connection.query(
-      'INSERT INTO `log` (`date`, `infected`, `recovered`, `deaths`, `tested`) VALUES (?, ?, ?, ?, ?)',
-      [log.date, log.infected, log.recovered, log.deaths, log.tested],
+      'INSERT INTO `log` (`date`, `infected`, `recovered`, `deaths`, `tested`, `infected_increment`, `recovered_increment`, `deaths_increment`, `tested_increment`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [
+        log.date,
+        log.infected,
+        log.recovered,
+        log.deaths,
+        log.tested,
+        log.infectedIncrement,
+        log.recoveredIncrement,
+        log.deathsIncrement,
+        log.testedIncrement
+      ],
       (error: mysql.MysqlError | null, result: any) => {
         if (error) throw error
       }
@@ -34,8 +48,18 @@ export default new (class database {
 
   public updateLogByDate(log: Log): void {
     this.connection.query(
-      'UPDATE `log` SET `infected`=?, `recovered`=?, `deaths`=?, `tested`=? WHERE `date`=?',
-      [log.infected, log.recovered, log.deaths, log.tested, log.date],
+      'UPDATE `log` SET `infected`=?, `recovered`=?, `deaths`=?, `tested`=?, `infected_increment`=?, `recovered_increment`=?, `deaths_increment`=?, `tested_increment`=? WHERE `date`=?',
+      [
+        log.infected,
+        log.recovered,
+        log.deaths,
+        log.tested,
+        log.infectedIncrement,
+        log.recoveredIncrement,
+        log.deathsIncrement,
+        log.testedIncrement,
+        log.date
+      ],
       (error: mysql.MysqlError | null, result: any) => {
         if (error) throw error
       }
@@ -59,8 +83,18 @@ export default new (class database {
   public getLog(log: Log): Promise<Log> {
     return new Promise((resolve, reject) => {
       this.connection.query(
-        'SELECT * FROM `log` WHERE `date`=? and `infected`=? and `recovered`=? and `deaths`=? and `tested`=? LIMIT 1',
-        [log.date, log.infected, log.recovered, log.deaths, log.tested],
+        'SELECT * FROM `log` WHERE `date`=? and `infected`=? and `recovered`=? and `deaths`=? and `tested`=? and `infected_increment`=? and `recovered_increment`=? and `deaths_increment`=? and `tested_increment`=? LIMIT 1',
+        [
+          log.date,
+          log.infected,
+          log.recovered,
+          log.deaths,
+          log.tested,
+          log.infectedIncrement,
+          log.recoveredIncrement,
+          log.deathsIncrement,
+          log.testedIncrement
+        ],
         (error: mysql.MysqlError | null, result: any) => {
           if (error) reject(error)
 
@@ -72,11 +106,15 @@ export default new (class database {
 
   public getLogByDate(date: Date): Promise<Log> {
     return new Promise((resolve, reject) => {
-      this.connection.query('SELECT * FROM `log` WHERE `date`=? LIMIT 1', [date], (error: mysql.MysqlError | null, result: any) => {
-        if (error) reject(error)
+      this.connection.query(
+        'SELECT * FROM `log` WHERE `date`=? LIMIT 1',
+        [date],
+        (error: mysql.MysqlError | null, result: any) => {
+          if (error) reject(error)
 
-        resolve(result[0])
-      })
+          resolve(result[0])
+        }
+      )
     })
   }
 

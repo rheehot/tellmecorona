@@ -26,33 +26,30 @@ let run = async () => {
       infected: newStatusInfected!.value,
       recovered: newStatusRecovered!.value,
       deaths: newStatusDeaths!.value,
-      tested: newStatusTested!.value
+      tested: newStatusTested!.value,
+      infectedIncrement: newStatusInfected!.increment,
+      recoveredIncrement: newStatusRecovered!.increment,
+      deathsIncrement: newStatusDeaths!.increment,
+      testedIncrement: newStatusTested!.increment
     }
 
     // 업데이트 데이터가 최신
     if ((await Database.getLog(newLog)) !== undefined) return
 
+    let messages: string[] = []
     let alreadyExistLog = await Database.getLogByDate(newUpdateDate)
     if (alreadyExistLog) {
+      // 데이터가 변경되어 재알림
+      messages.push('[데이터가 새로 업데이트 되었습니다]')
       Database.updateLogByDate(newLog)
     } else {
       Database.addLog(newLog)
     }
 
-    let lastLog: Log = await Database.getLastLogByDateLessThan(newLog.date)
-    let messages: string[] = []
     messages.push(moment(newLog.date).format('YYYY년 MM월 DD일 A hh시'))
     newStatusList.forEach((item: Status) => {
-      let increment: number = item.value - Number(lastLog[item.key])
-      messages.push(`${item.title} ${item.displayValue}명` + (increment > 0 ? `(+${increment})` : ''))
+      messages.push(`${item.title} ${item.displayValue}명` + (item.increment > 0 ? `(+${item.increment})` : ''))
     })
-
-    // 데이터가 변경되어 재알림
-    if (alreadyExistLog) {
-      let newMessages = messages.slice()
-      newMessages.unshift('[데이터가 새로 업데이트 되었습니다]')
-      TelegramAPI.sendMessage(newMessages.join('\n'))
-    }
 
     console.log(messages.join('\n'))
     TelegramAPI.sendMessage(messages.join('\n'))
