@@ -9,17 +9,21 @@ export interface Status {
 }
 
 export default new (class Parser {
-  public getUpdateDate(html: string): Date {
-    const $: CheerioStatic = cheerio.load(html)
-    let text: string = $('.update_info .text').text()
-    let pattern: RegExp = /최종업데이트 ([0-9]+)\.([0-9]+)\.([0-9]+)\. ([0-9]+):([0-9]+)/
+  public replaceUpdateDateTextToDateObject(text: string): Date {
+    let pattern: RegExp = /([0-9]+)\.([0-9]+)\.([0-9]+)\. ([0-9]+):([0-9]+)/
     let regexp: RegExpExecArray | null = pattern.exec(text)
 
     if (regexp === null) throw '업데이트 날짜 파싱 실패'
 
     let [, year, month, date, hours, minutes] = regexp
-
     return new Date(Number(year), Number(month) - 1, Number(date), Number(hours), Number(minutes))
+  }
+
+  public getUpdateDate(html: string): Date {
+    const $: CheerioStatic = cheerio.load(html)
+    let text: string = $('.update_info .text').text()
+
+    return this.replaceUpdateDateTextToDateObject(text)
   }
 
   public getStatus(html: string): Status[] {
