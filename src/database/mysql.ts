@@ -104,8 +104,8 @@ export default new (class database {
         (error: mysql.MysqlError | null, result: any) => {
           if (error) reject(error)
 
-          if (result === undefined) {
-            resolve(result)
+          if (result[0] === undefined) {
+            resolve(result[0])
           } else {
             resolve(result[0].date)
           }
