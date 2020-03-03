@@ -116,7 +116,7 @@ let runRegion = () => {
 
 let run = async () => {
   try {
-    // await runStatus()
+    await runStatus()
     await runRegion()
   } catch (error) {
     console.error(error)
