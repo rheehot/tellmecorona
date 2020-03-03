@@ -63,12 +63,13 @@ let runStatus = async () => {
 let runRegion = () => {
   return new Promise(async (resolve: any, reject: any) => {
     let regionData: ApiRegionObject = await Requester.loadRegion()
-    let updateDate = Parser.replaceUpdateDateTextToDateObject(regionData.result.updateTime)
+    let updateDate: Date = Parser.replaceUpdateDateTextToDateObject(regionData.result.updateTime)
 
     if (Object.keys(regionData.result).length === 0 || Object.keys(regionData.result.regions).length === 0)
       throw '지역별 확진자 파싱 실패'
     if (regionData.result.updateTime.length === 0) throw '지역별 확진자 업데이트 날짜 파싱 실패'
 
+    let previousUpdateDate: Date | undefined = await Database.getPreviousDateFromRegionLog(updateDate)
     let lastUpdateDate = await Database.getLastDateFromRegionLog()
 
     let messages: string[] = []
@@ -81,18 +82,36 @@ let runRegion = () => {
         infected: Number(region.count.replace(',', '')),
         ratio: Number(region.rate.replace('%', ''))
       }
-      let displayInfected = region.count
+      let displayInfected: string = region.count
 
+      // 기존에 데이터가 있는지 검사
       let regionLog: RegionLog | undefined = await Database.getRegionLogByDateAndName(newRegionLog.date, newRegionLog.name)
       if (regionLog === undefined) {
         await Database.addRegionLog(newRegionLog)
-        messages.push(`${newRegionLog.name} ${displayInfected}명`)
+
+        // 이전 데이터가 있을 경우 비교
+        let increment: number = 0
+        if (previousUpdateDate !== undefined) {
+          let previousRegionLog: RegionLog | undefined = await Database.getRegionLogByDateAndName(
+            previousUpdateDate,
+            newRegionLog.name
+          )
+          if (previousRegionLog !== undefined) {
+            increment = newRegionLog.infected - previousRegionLog.infected
+            console.log('increment ' + increment)
+          }
+        }
+
+        messages.push(
+          `${newRegionLog.name} ${displayInfected}명` + (increment > 0 ? `(+${increment})` : '') + ' ' + newRegionLog.ratio + '%'
+        )
       }
     })
 
     // 기존에 데이터가 없으므로 새로운 데이터이거나 비교해서 새로운 데이터
     if (lastUpdateDate === undefined || updateDate > lastUpdateDate) {
       TelegramAPI.sendMessageAdmin(messages.join('\n'))
+      console.log(messages.join('\n'))
     }
 
     resolve()
