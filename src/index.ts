@@ -62,55 +62,50 @@ let runStatus = async () => {
 
 let runRegion = () => {
   return new Promise(async (resolve: any, reject: any) => {
-    let regionData: ApiRegionObject = await Requester.loadRegion()
-    let updateDate: Date = Parser.replaceUpdateDateTextToDateObject(regionData.result.updateTime)
+    let apiRegionData: ApiRegionObject = await Requester.loadRegion()
+    let apiUpdateDate: Date = Parser.replaceUpdateDateTextToDateObject(apiRegionData.result.updateTime)
 
-    if (Object.keys(regionData.result).length === 0 || Object.keys(regionData.result.regions).length === 0)
+    if (Object.keys(apiRegionData.result).length === 0 || Object.keys(apiRegionData.result.regions).length === 0)
       throw '지역별 확진자 파싱 실패'
-    if (regionData.result.updateTime.length === 0) throw '지역별 확진자 업데이트 날짜 파싱 실패'
+    if (apiRegionData.result.updateTime.length === 0) throw '지역별 확진자 업데이트 날짜 파싱 실패'
 
-    let previousUpdateDate: Date | undefined = await Database.getPreviousDateFromRegionLog(updateDate)
-    let lastUpdateDate = await Database.getLastDateFromRegionLog()
+    let prevUpdateDate: Date | undefined = await Database.getPreviousDateFromRegionLog(apiUpdateDate)
+    let newRegionDataFlag = false
 
     let messages: string[] = []
     messages.push('[지역별 확진환자 현황]')
-    messages.push(moment(updateDate).format('YYYY년 MM월 DD일 A hh시'))
-    await asyncForEach(regionData.result.regions, async (region: ApiRegion) => {
+    messages.push(moment(apiUpdateDate).format('YYYY년 MM월 DD일 A hh시'))
+
+    await asyncForEach(apiRegionData.result.regions, async (region: ApiRegion) => {
       let newRegionLog: RegionLog = {
-        date: updateDate,
+        date: apiUpdateDate,
         name: region.title,
         infected: Number(region.count.replace(',', '')),
         ratio: Number(region.rate.replace('%', ''))
       }
-      let displayInfected: string = region.count
 
-      // 기존에 데이터가 있는지 검사
       let regionLog: RegionLog | undefined = await Database.getRegionLogByDateAndName(newRegionLog.date, newRegionLog.name)
       if (regionLog === undefined) {
+        newRegionDataFlag = true
         await Database.addRegionLog(newRegionLog)
 
-        // 이전 데이터가 있을 경우 비교
-        let increment: number = 0
-        if (previousUpdateDate !== undefined) {
-          let previousRegionLog: RegionLog | undefined = await Database.getRegionLogByDateAndName(
-            previousUpdateDate,
-            newRegionLog.name
-          )
-          if (previousRegionLog !== undefined) {
-            increment = newRegionLog.infected - previousRegionLog.infected
-            console.log('increment ' + increment)
+        if (prevUpdateDate === undefined) return
+
+        let previousRegionLog: RegionLog | undefined = await Database.getRegionLogByDateAndName(prevUpdateDate, newRegionLog.name)
+        let incrementMessage: string | null = null
+        if (previousRegionLog) {
+          let increment: number = newRegionLog.infected - previousRegionLog.infected
+
+          if (increment > 0) {
+            incrementMessage = `(+${increment})`
           }
         }
 
-        messages.push(
-          // `${newRegionLog.name} ${displayInfected}명` + (increment > 0 ? `(+${increment})` : '') + ' ' + newRegionLog.ratio + '%'
-          `${newRegionLog.name} ${displayInfected}명` + (increment > 0 ? `(+${increment})` : '')
-        )
+        messages.push(`${newRegionLog.name} ${region.count}명` + (incrementMessage ? incrementMessage : ''))
       }
     })
 
-    // 기존에 데이터가 없으므로 새로운 데이터이거나 비교해서 새로운 데이터
-    if (lastUpdateDate === undefined || updateDate > lastUpdateDate) {
+    if (newRegionDataFlag) {
       TelegramAPI.sendMessageAdmin(messages.join('\n'))
       console.log(messages.join('\n'))
     }
@@ -121,7 +116,7 @@ let runRegion = () => {
 
 let run = async () => {
   try {
-    await runStatus()
+    // await runStatus()
     await runRegion()
   } catch (error) {
     console.error(error)
