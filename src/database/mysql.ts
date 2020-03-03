@@ -83,20 +83,6 @@ export default new (class database {
     )
   }
 
-  public getLastLogByDateLessThan(date: Date): Promise<Log> {
-    return new Promise((resolve, reject) => {
-      this.connection.query(
-        'SELECT * FROM `log` where `date`<? ORDER BY `date` DESC LIMIT 1',
-        [date],
-        (error: mysql.MysqlError | null, result: any) => {
-          if (error) reject(error)
-
-          resolve(result[0])
-        }
-      )
-    })
-  }
-
   public getLastDateFromRegionLog(): Promise<Date> | undefined {
     return new Promise((resolve, reject) => {
       this.connection.query(
