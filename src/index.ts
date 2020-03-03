@@ -103,7 +103,8 @@ let runRegion = () => {
         }
 
         messages.push(
-          `${newRegionLog.name} ${displayInfected}명` + (increment > 0 ? `(+${increment})` : '') + ' ' + newRegionLog.ratio + '%'
+          // `${newRegionLog.name} ${displayInfected}명` + (increment > 0 ? `(+${increment})` : '') + ' ' + newRegionLog.ratio + '%'
+          `${newRegionLog.name} ${displayInfected}명` + (increment > 0 ? `(+${increment})` : '')
         )
       }
     })
