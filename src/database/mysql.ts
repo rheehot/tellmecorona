@@ -90,11 +90,20 @@ export default new (class database {
         (error: mysql.MysqlError | null, result: any) => {
           if (error) reject(error)
 
-          if (result[0] === undefined) {
-            resolve(result[0])
-          } else {
-            resolve(result[0].date)
-          }
+          resolve(result[0] === undefined ? undefined : result[0].date)
+        }
+      )
+    })
+  }
+  public getPreviousDateFromRegionLog(date: Date): Promise<Date> | undefined {
+    return new Promise((resolve, reject) => {
+      this.connection.query(
+        'SELECT `date` FROM `region_log` WHERE `date`<? ORDER BY `date` DESC LIMIT 1',
+        [date],
+        (error: mysql.MysqlError | null, result: any) => {
+          if (error) reject(error)
+
+          resolve(result[0] === undefined ? undefined : result[0].date)
         }
       )
     })
@@ -132,11 +141,21 @@ export default new (class database {
         (error: mysql.MysqlError | null, result: any) => {
           if (error) reject(error)
 
-          if (result === undefined) {
-            resolve(result)
-          } else {
-            resolve(result[0])
-          }
+          resolve(result[0] === undefined ? undefined : result[0])
+        }
+      )
+    })
+  }
+
+  public getRegionLogListByDate(date: Date): Promise<RegionLog[]> {
+    return new Promise((resolve, reject) => {
+      this.connection.query(
+        'SELECT * FROM `region_log` WHERE `date`=?',
+        [date],
+        (error: mysql.MysqlError | null, result: any) => {
+          if (error) reject(error)
+
+          resolve(result)
         }
       )
     })
