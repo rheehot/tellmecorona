@@ -106,7 +106,7 @@ let runRegion = () => {
     })
 
     if (newRegionDataFlag) {
-      TelegramAPI.sendMessageAdmin(messages.join('\n'))
+      TelegramAPI.sendMessage(messages.join('\n'))
       console.log(messages.join('\n'))
     }
 
