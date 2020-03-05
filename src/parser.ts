@@ -21,8 +21,8 @@ export default new (class Parser {
 
   public getUpdateDate(html: string): Date {
     const $: CheerioStatic = cheerio.load(html)
-    let text: string = $('._update_time')
-      .eq(1)
+    let text: string = $('.info_text')
+      .first()
       .text()
 
     return this.replaceUpdateDateTextToDateObject(text)
