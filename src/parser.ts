@@ -43,10 +43,13 @@ export default new (class Parser {
         .find('.info_variation')
         .text()
       let value: number = Number(displayValue.replace(',', ''))
-      let increment: number = Number(displayIncrement.replace(',', ''))
       let statusKey: string | null = this.replaceStatuskeyByTitle(title)
+      let increment: number = 0
 
       if (statusKey === null) throw '확진자 현황 파싱 실패'
+      if (displayIncrement !== '-') {
+        increment = Number(displayIncrement.replace(',', ''))
+      }
 
       statusList.push({
         key: statusKey,
